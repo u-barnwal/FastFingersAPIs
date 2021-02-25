@@ -119,6 +119,39 @@ app.post("/apis/players/register", (request, response) => {
 
 // - players: End - //
 
+// - game_history: End - //
+
+app.post(
+  "/apis/game-history/insert",
+  authenticateToken,
+  (request, response) => {
+    const { score, start_level, end_level } = request.body;
+
+    if (!validateMandatoryParams([score, start_level, end_level])) {
+      response.sendStatus(CODE.BAD_REQUEST);
+      return;
+    }
+
+    console.log("re");
+
+    db.query(
+      "INSERT INTO game_history (player_id, score, start_level, end_level) VALUES (?, ?, ?, ?)",
+      [request.user.id, score, start_level, end_level],
+      (error, result) => {
+        // ! handing error
+        if (error) {
+          response.status(CODE.INTERNAL_SERVER_ERROR).send();
+          return;
+        }
+
+        response.status(CODE.SUCCESS).send(result);
+      }
+    );
+  }
+);
+
+// - game_history: End - //
+
 app.listen(3000);
 
 // - Utils functions

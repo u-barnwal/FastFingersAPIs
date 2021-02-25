@@ -17,11 +17,12 @@ const db = mysql.createPool({
 const jwt = require("jsonwebtoken");
 
 const CODE = {
-  INTERNAL_SERVER_ERROR: 500,
   SUCCESS: 200,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
+  UNAUTHENTICATED: 403,
   NOT_ALLOWED: 405,
+  INTERNAL_SERVER_ERROR: 500,
 };
 
 app.use(cors());
@@ -30,7 +31,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (request, response) => response.send("404: Nothing here!"));
 
-// - players
+// - players: Start - //
+
 app.post("/apis/players/login", (request, response) => {
   const { email, password } = request.body;
 
@@ -106,9 +108,26 @@ app.post("/apis/players/register", (request, response) => {
   });
 });
 
+// - players: End - //
+
 app.listen(3000);
 
 // - Utils functions
+
+function authenticateToken(request, response, next) {
+  const authHeader = request.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  // ~ doesn't have a authToken
+  if (token === null) return response.sendStatus(CODE.UNAUTHORIZED);
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
+    if (error) return response.sendStatus(CODE.UNAUTHENTICATED);
+
+    request.user = user;
+    next();
+  });
+}
 
 function validateMandatoryParams(params = []) {
   for (const param of params) {

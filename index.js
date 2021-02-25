@@ -65,8 +65,11 @@ app.post("/apis/players/login", (request, response) => {
 
       const user = result[0];
 
+      delete user.password;
+
       const accessToken = jwt.sign(
-        { id: user.id, email: user.email },
+        // user,
+        { ...user },
         process.env.ACCESS_TOKEN_SECRET
       );
 
@@ -125,10 +128,16 @@ function authenticateToken(request, response, next) {
   const token = authHeader && authHeader.split(" ")[1];
 
   // ~ doesn't have a authToken
-  if (token === null) return response.status(CODE.UNAUTHORIZED).send();
+  if (token === null)
+    return response
+      .status(CODE.UNAUTHORIZED)
+      .send("Request doesn't have any access token!");
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
-    if (error) return response.sendStatus(CODE.UNAUTHENTICATED);
+    if (error)
+      return response
+        .status(CODE.UNAUTHENTICATED)
+        .send("Request doesn't have valid access token'");
 
     request.user = user;
     next();

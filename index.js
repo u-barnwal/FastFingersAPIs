@@ -30,14 +30,19 @@ app.get("/", (request, response) => response.send("404: Nothing here!"));
 app.post("/apis/players/login", (request, response) => {
   const { email, password } = request.body;
 
-  if (!validateMandatoryParams([email, password]))
+  if (!validateMandatoryParams([email, password])) {
     response.sendStatus(CODE.BAD_REQUEST);
+    return;
+  }
 
   db.query(
     "SELECT * FROM players WHERE email=? AND password=?",
     [email, password],
     (error, result) => {
-      if (!result || result.length <= 0) response.sendStatus(CODE.UNAUTHORIZED);
+      if (!result || result.length <= 0) {
+        response.sendStatus(CODE.UNAUTHORIZED);
+        return;
+      }
 
       const user = result[0];
 
@@ -49,22 +54,26 @@ app.post("/apis/players/login", (request, response) => {
 app.post("/apis/players/register", (request, response) => {
   const { name, email, password } = request.body;
 
-  if (!validateMandatoryParams([name, email, password]))
+  if (!validateMandatoryParams([name, email, password])) {
     response.sendStatus(CODE.BAD_REQUEST);
+    return;
+  }
 
   // ? is email already used
   db.query("SELECT * FROM players WHERE email=?", [email], (error, result) => {
-    if (result && result.length > 0)
+    if (result && result.length > 0) {
       response.status(CODE.NOT_ALLOWED).send("Email address already used!");
-    else
-      db.query(
-        "INSERT INTO players (name, email, password) VALUES (?, ?, ?)",
-        [name, email, password],
-        (error, result) => {
-          if (error) response.status(CODE.INTERNAL_SERVER_ERROR).send();
-          else response.status(CODE.SUCCESS).send(result);
-        }
-      );
+      return;
+    }
+
+    db.query(
+      "INSERT INTO players (name, email, password) VALUES (?, ?, ?)",
+      [name, email, password],
+      (error, result) => {
+        if (error) response.status(CODE.INTERNAL_SERVER_ERROR).send();
+        else response.status(CODE.SUCCESS).send(result);
+      }
+    );
   });
 });
 

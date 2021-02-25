@@ -33,6 +33,10 @@ app.get("/", (request, response) => response.send("404: Nothing here!"));
 
 // - players: Start - //
 
+app.post("/apis/players/profile", authenticateToken, (request, response) => {
+  response.status(CODE.SUCCESS).send(request.user);
+});
+
 app.post("/apis/players/login", (request, response) => {
   const { email, password } = request.body;
 

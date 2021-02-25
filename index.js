@@ -132,8 +132,6 @@ app.post(
       return;
     }
 
-    console.log("re");
-
     db.query(
       "INSERT INTO game_history (player_id, score, start_level, end_level) VALUES (?, ?, ?, ?)",
       [request.user.id, score, start_level, end_level],
@@ -149,6 +147,22 @@ app.post(
     );
   }
 );
+
+app.post("/apis/game-history/fetch", authenticateToken, (request, response) => {
+  db.query(
+    "SELECT * FROM game_history WHERE player_id=?",
+    [request.user.id],
+    (error, result) => {
+      // ! handing error
+      if (error) {
+        response.status(CODE.INTERNAL_SERVER_ERROR).send();
+        return;
+      }
+
+      response.status(CODE.SUCCESS).send(result);
+    }
+  );
+});
 
 // - game_history: End - //
 

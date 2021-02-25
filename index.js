@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
@@ -11,6 +13,8 @@ const db = mysql.createPool({
   password: "",
   database: "fast_fingers",
 });
+
+const jwt = require("jsonwebtoken");
 
 const CODE = {
   INTERNAL_SERVER_ERROR: 500,
@@ -39,6 +43,13 @@ app.post("/apis/players/login", (request, response) => {
     "SELECT * FROM players WHERE email=? AND password=?",
     [email, password],
     (error, result) => {
+      // ! handing error
+      if (error) {
+        response.status(CODE.INTERNAL_SERVER_ERROR).send();
+        return;
+      }
+
+      // ~ no players found, terminate
       if (!result || result.length <= 0) {
         response.sendStatus(CODE.UNAUTHORIZED);
         return;
@@ -46,7 +57,12 @@ app.post("/apis/players/login", (request, response) => {
 
       const user = result[0];
 
-      response.status(CODE.SUCCESS).send(result);
+      const accessToken = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+
+      response.status(CODE.SUCCESS).json({ accessToken });
     }
   );
 });
@@ -61,17 +77,30 @@ app.post("/apis/players/register", (request, response) => {
 
   // ? is email already used
   db.query("SELECT * FROM players WHERE email=?", [email], (error, result) => {
+    // ! handing error
+    if (error) {
+      response.status(CODE.INTERNAL_SERVER_ERROR).send();
+      return;
+    }
+
+    // ~ email already used, terminate
     if (result && result.length > 0) {
       response.status(CODE.NOT_ALLOWED).send("Email address already used!");
       return;
     }
 
+    // ^ unique email, continue
     db.query(
       "INSERT INTO players (name, email, password) VALUES (?, ?, ?)",
       [name, email, password],
       (error, result) => {
-        if (error) response.status(CODE.INTERNAL_SERVER_ERROR).send();
-        else response.status(CODE.SUCCESS).send(result);
+        // ! handing error
+        if (error) {
+          response.status(CODE.INTERNAL_SERVER_ERROR).send();
+          return;
+        }
+
+        response.status(CODE.SUCCESS).send(result);
       }
     );
   });

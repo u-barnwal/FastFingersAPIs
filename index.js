@@ -57,7 +57,9 @@ app.post("/apis/players/login", (request, response) => {
 
       // ~ no players found, terminate
       if (!result || result.length <= 0) {
-        response.sendStatus(CODE.UNAUTHORIZED);
+        response
+          .status(CODE.UNAUTHORIZED)
+          .send("Invalid email address or password!");
         return;
       }
 
@@ -123,7 +125,7 @@ function authenticateToken(request, response, next) {
   const token = authHeader && authHeader.split(" ")[1];
 
   // ~ doesn't have a authToken
-  if (token === null) return response.sendStatus(CODE.UNAUTHORIZED);
+  if (token === null) return response.status(CODE.UNAUTHORIZED).send();
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
     if (error) return response.sendStatus(CODE.UNAUTHENTICATED);

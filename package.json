@@ -1,5 +1,5 @@
 {
-  "name": "fast-fingers-server",
+  "name": "fast-fingers-apis",
   "version": "1.0.0",
   "description": "backend server for fast fingers project",
   "main": "index.js",

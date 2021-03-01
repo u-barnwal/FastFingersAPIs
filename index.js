@@ -166,7 +166,7 @@ app.post("/apis/game-history/fetch", authenticateToken, (request, response) => {
 
 // - game_history: End - //
 
-app.listen(3000);
+app.listen(3000 || process.env.port);
 
 // - Utils functions
 

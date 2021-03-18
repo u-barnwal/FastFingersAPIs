@@ -4,6 +4,8 @@ if (process.env.NODE_ENV === "development")
   env.config({ path: ".env.development" });
 else env.config({ path: ".env.production" });
 
+console.log(process.env);
+
 const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");

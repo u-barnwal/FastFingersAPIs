@@ -11,8 +11,6 @@ const cors = require("cors");
 
 const app = express();
 
-console.log(process.env);
-
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

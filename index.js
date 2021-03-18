@@ -37,136 +37,136 @@ app.get("/", (request, response) => response.send("404: Nothing here!"));
 
 // - players: Start - //
 
-app.post("/apis/players/profile", authenticateToken, (request, response) => {
-  response.status(CODE.SUCCESS).send(request.user);
-});
+// app.post("/apis/players/profile", authenticateToken, (request, response) => {
+//   response.status(CODE.SUCCESS).send(request.user);
+// });
 
-app.post("/apis/players/login", (request, response) => {
-  const { email, password } = request.body;
+// app.post("/apis/players/login", (request, response) => {
+//   const { email, password } = request.body;
 
-  if (!validateMandatoryParams([email, password])) {
-    response.sendStatus(CODE.BAD_REQUEST);
-    return;
-  }
+//   if (!validateMandatoryParams([email, password])) {
+//     response.sendStatus(CODE.BAD_REQUEST);
+//     return;
+//   }
 
-  db.query(
-    "SELECT * FROM players WHERE email=? AND password=?",
-    [email, password],
-    (error, result) => {
-      // ! handing error
-      if (error) {
-        response.status(CODE.INTERNAL_SERVER_ERROR).send();
-        return;
-      }
+//   db.query(
+//     "SELECT * FROM players WHERE email=? AND password=?",
+//     [email, password],
+//     (error, result) => {
+//       // ! handing error
+//       if (error) {
+//         response.status(CODE.INTERNAL_SERVER_ERROR).send();
+//         return;
+//       }
 
-      // ~ no players found, terminate
-      if (!result || result.length <= 0) {
-        response
-          .status(CODE.UNAUTHORIZED)
-          .send("Invalid email address or password!");
-        return;
-      }
+//       // ~ no players found, terminate
+//       if (!result || result.length <= 0) {
+//         response
+//           .status(CODE.UNAUTHORIZED)
+//           .send("Invalid email address or password!");
+//         return;
+//       }
 
-      const user = result[0];
+//       const user = result[0];
 
-      delete user.password;
+//       delete user.password;
 
-      const accessToken = jwt.sign(
-        // user,
-        { ...user },
-        process.env.ACCESS_TOKEN_SECRET
-      );
+//       const accessToken = jwt.sign(
+//         // user,
+//         { ...user },
+//         process.env.ACCESS_TOKEN_SECRET
+//       );
 
-      response.status(CODE.SUCCESS).json({ accessToken });
-    }
-  );
-});
+//       response.status(CODE.SUCCESS).json({ accessToken });
+//     }
+//   );
+// });
 
-app.post("/apis/players/register", (request, response) => {
-  const { name, email, password } = request.body;
+// app.post("/apis/players/register", (request, response) => {
+//   const { name, email, password } = request.body;
 
-  if (!validateMandatoryParams([name, email, password])) {
-    response.sendStatus(CODE.BAD_REQUEST);
-    return;
-  }
+//   if (!validateMandatoryParams([name, email, password])) {
+//     response.sendStatus(CODE.BAD_REQUEST);
+//     return;
+//   }
 
-  // ? is email already used
-  db.query("SELECT * FROM players WHERE email=?", [email], (error, result) => {
-    // ! handing error
-    if (error) {
-      response.status(CODE.INTERNAL_SERVER_ERROR).send();
-      return;
-    }
+//   // ? is email already used
+//   db.query("SELECT * FROM players WHERE email=?", [email], (error, result) => {
+//     // ! handing error
+//     if (error) {
+//       response.status(CODE.INTERNAL_SERVER_ERROR).send();
+//       return;
+//     }
 
-    // ~ email already used, terminate
-    if (result && result.length > 0) {
-      response.status(CODE.NOT_ALLOWED).send("Email address already used!");
-      return;
-    }
+//     // ~ email already used, terminate
+//     if (result && result.length > 0) {
+//       response.status(CODE.NOT_ALLOWED).send("Email address already used!");
+//       return;
+//     }
 
-    // ^ unique email, continue
-    db.query(
-      "INSERT INTO players (name, email, password) VALUES (?, ?, ?)",
-      [name, email, password],
-      (error, result) => {
-        // ! handing error
-        if (error) {
-          response.status(CODE.INTERNAL_SERVER_ERROR).send();
-          return;
-        }
+//     // ^ unique email, continue
+//     db.query(
+//       "INSERT INTO players (name, email, password) VALUES (?, ?, ?)",
+//       [name, email, password],
+//       (error, result) => {
+//         // ! handing error
+//         if (error) {
+//           response.status(CODE.INTERNAL_SERVER_ERROR).send();
+//           return;
+//         }
 
-        response.status(CODE.SUCCESS).send(result);
-      }
-    );
-  });
-});
+//         response.status(CODE.SUCCESS).send(result);
+//       }
+//     );
+//   });
+// });
 
 // - players: End - //
 
 // - game_history: End - //
 
-app.post(
-  "/apis/game-history/insert",
-  authenticateToken,
-  (request, response) => {
-    const { score, start_level, end_level } = request.body;
+// app.post(
+//   "/apis/game-history/insert",
+//   authenticateToken,
+//   (request, response) => {
+//     const { score, start_level, end_level } = request.body;
 
-    if (!validateMandatoryParams([score, start_level, end_level])) {
-      response.sendStatus(CODE.BAD_REQUEST);
-      return;
-    }
+//     if (!validateMandatoryParams([score, start_level, end_level])) {
+//       response.sendStatus(CODE.BAD_REQUEST);
+//       return;
+//     }
 
-    db.query(
-      "INSERT INTO game_history (player_id, score, start_level, end_level) VALUES (?, ?, ?, ?)",
-      [request.user.id, score, start_level, end_level],
-      (error, result) => {
-        // ! handing error
-        if (error) {
-          response.status(CODE.INTERNAL_SERVER_ERROR).send();
-          return;
-        }
+//     db.query(
+//       "INSERT INTO game_history (player_id, score, start_level, end_level) VALUES (?, ?, ?, ?)",
+//       [request.user.id, score, start_level, end_level],
+//       (error, result) => {
+//         // ! handing error
+//         if (error) {
+//           response.status(CODE.INTERNAL_SERVER_ERROR).send();
+//           return;
+//         }
 
-        response.status(CODE.SUCCESS).send(result);
-      }
-    );
-  }
-);
+//         response.status(CODE.SUCCESS).send(result);
+//       }
+//     );
+//   }
+// );
 
-app.post("/apis/game-history/fetch", authenticateToken, (request, response) => {
-  db.query(
-    "SELECT * FROM game_history WHERE player_id=?",
-    [request.user.id],
-    (error, result) => {
-      // ! handing error
-      if (error) {
-        response.status(CODE.INTERNAL_SERVER_ERROR).send();
-        return;
-      }
+// app.post("/apis/game-history/fetch", authenticateToken, (request, response) => {
+//   db.query(
+//     "SELECT * FROM game_history WHERE player_id=?",
+//     [request.user.id],
+//     (error, result) => {
+//       // ! handing error
+//       if (error) {
+//         response.status(CODE.INTERNAL_SERVER_ERROR).send();
+//         return;
+//       }
 
-      response.status(CODE.SUCCESS).send(result);
-    }
-  );
-});
+//       response.status(CODE.SUCCESS).send(result);
+//     }
+//   );
+// });
 
 // - game_history: End - //
 

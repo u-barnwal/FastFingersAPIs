@@ -57,6 +57,7 @@ app.post("/apis/players/login", (request, response) => {
     (error, result) => {
       // ! handing error
       if (error) {
+        console.log("Login Error", error);
         response.status(CODE.INTERNAL_SERVER_ERROR).send();
         return;
       }

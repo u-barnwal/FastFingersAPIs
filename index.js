@@ -1,4 +1,8 @@
-require("dotenv").config();
+const env = require("dotenv");
+
+if (process.env.NODE_ENV === "development")
+  env.config({ path: ".env.development" });
+else env.config({ path: ".env.production" });
 
 const express = require("express");
 const mysql = require("mysql");
@@ -7,11 +11,13 @@ const cors = require("cors");
 
 const app = express();
 
+console.log(process.env);
+
 const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "fast_fingers",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 const jwt = require("jsonwebtoken");

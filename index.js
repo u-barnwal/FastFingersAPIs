@@ -170,7 +170,7 @@ app.get("/", (request, response) => response.send("404: Nothing here!"));
 
 // - game_history: End - //
 
-app.listen(3000 || process.env.PORT);
+app.listen(process.env.PORT || 3000);
 
 // - Utils functions
 

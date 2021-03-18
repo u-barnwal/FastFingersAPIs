@@ -1,8 +1,8 @@
 const env = require("dotenv");
 
-if (process.env.NODE_ENV === "development")
-  env.config({ path: ".env.development" });
-else env.config({ path: ".env.production" });
+// if (process.env.NODE_ENV === "development")
+//   env.config({ path: ".env.development" });
+// else env.config({ path: ".env.production" });
 
 const express = require("express");
 const mysql = require("mysql");
